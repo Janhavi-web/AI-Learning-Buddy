@@ -17,7 +17,7 @@ except Exception:
     st.error("Gemini API key not found. Add GEMINI_API_KEY in Streamlit secrets to run this app.")
     st.stop()
 
-MODEL = "gemini-2.5-flash"
+MODEL = "gemini-3.1-flash-lite"
 
 PERSONA_PROMPT = """You are Professor Neuron, an AI Learning Buddy that teaches {topic} to a
 complete beginner learner. Your tone is warm, patient, and encouraging, but precise — you never
