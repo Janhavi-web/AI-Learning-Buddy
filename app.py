@@ -1,5 +1,5 @@
 import streamlit as st
-import google.generativeai as genai
+from google import genai
 
 # ---------------------------------------------------------
 # AI Learning Buddy — "Professor Neuron"
@@ -12,12 +12,12 @@ st.set_page_config(page_title="AI Learning Buddy — Professor Neuron", page_ico
 # Add your Gemini API key in Streamlit Cloud under:
 # App settings -> Secrets ->  GEMINI_API_KEY = "your-key-here"
 try:
-    genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+    client = genai.Client(api_key=st.secrets["GEMINI_API_KEY"])
 except Exception:
     st.error("Gemini API key not found. Add GEMINI_API_KEY in Streamlit secrets to run this app.")
     st.stop()
 
-model = genai.GenerativeModel("gemini-1.5-flash")
+MODEL = "gemini-2.5-flash"
 
 PERSONA_PROMPT = """You are Professor Neuron, an AI Learning Buddy that teaches {topic} to a
 complete beginner learner. Your tone is warm, patient, and encouraging, but precise — you never
@@ -76,11 +76,14 @@ if st.button("Ask Professor Neuron", type="primary"):
         user_prompt = TEMPLATES[activity].format(
             topic=topic, question=question_input, answer=answer_input
         )
-        full_prompt = PERSONA_PROMPT.format(topic=topic) + "\n\n" + user_prompt
         try:
-            response = model.generate_content(full_prompt)
+            interaction = client.interactions.create(
+                model=MODEL,
+                system_instruction=PERSONA_PROMPT.format(topic=topic),
+                input=user_prompt,
+            )
             st.markdown("### Response")
-            st.write(response.text)
+            st.write(interaction.output_text)
         except Exception as e:
             st.error(f"Something went wrong calling the Gemini API: {e}")
 
